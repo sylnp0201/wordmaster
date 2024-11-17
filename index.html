@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #e3f2fd;
+            margin: 0;
+        }
+        .card-container {
+            position: relative;
+            width: 390px;
+            height: 260px;
+            perspective: 1000px;
+        }
+        .card {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        .card.flip {
+            transform: rotateY(180deg);
+        }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-size: 1.25rem;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card-face.front {
+            background: #90caf9;
+            color: #0d47a1;
+        }
+        .card-face.back {
+            font-size: 40px;
+            transform: rotateY(180deg);
+            background: #ffcc80;
+            color: #bf360c;
+        }
+        .next-button {
+            position: absolute;
+            bottom: -50px;
+            right: 0;
+            background: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 480px) {
+            .card-container {
+                width: 90%;
+                height: auto;
+            }
+            .card-face {
+                font-size: 1rem;
+                padding: 15px;
+            }
+            .next-button {
+                bottom: -40px;
+            }
+        }
+    </style>
+    <title>Flash Card</title>
+</head>
+<body>
+    <div class="card-container">
+        <div class="card" id="flashcard">
+            <div class="card-face front" id="front-face"></div>
+            <div class="card-face back" id="back-face"></div>
+        </div>
+        <button class="next-button" id="next-button">Next</button>
+    </div>
+    <script>
+        const words = [
+            { "word": "feast", "part_of_speech": "n.", "definition": "a large meal, typically one in celebration of something" },
+            { "word": "feast", "part_of_speech": "v.", "definition": "eat and drink sumptuously" },
+            { "word": "shove", "part_of_speech": "v.", "definition": "to push someone or something in a rough way" },
+            { "word": "shove", "part_of_speech": "n.", "definition": "a strong push" },
+            { "word": "gleaming", "part_of_speech": "adj.", "definition": "(of a smooth surface) reflecting light, typically because very clean or polished" },
+            { "word": "fir", "part_of_speech": "n.", "definition": "an evergreen coniferous tree with upright cones and flat needle-shaped leaves, typically arranged in two rows." },
+            { "word": "pause", "part_of_speech": "v.", "definition": "interrupt action or speech briefly" },
+            { "word": "pause", "part_of_speech": "n.", "definition": "a temporary stop in action or speech" },
+            { "word": "mum", "part_of_speech": "v.", "definition": "act in a traditional masked mime or a mummers' play" },
+            { "word": "pride", "part_of_speech": "n.", "definition": "a feeling of deep pleasure derived from one’s own achievements" },
+            { "word": "pride", "part_of_speech": "v.", "definition": "be especially proud of a quality or skill" },
+            { "word": "cram", "part_of_speech": "v.", "definition": "force down something into/down; learn a lot in a short time for an exam" },
+            { "word": "glossy", "part_of_speech": "adj.", "definition": "smooth and shiny, highly polished; superficially attractive or expensive" },
+            { "word": "glossy", "part_of_speech": "n.", "definition": "a photo printed on a glossy page" },
+            { "word": "oak", "part_of_speech": "n.", "definition": "a tree that bears acorns as fruit, and typically has lobed deciduous leaves." },
+            { "word": "rank", "part_of_speech": "n.", "definition": "a position in the hierarchy of a grading system" },
+            { "word": "rank", "part_of_speech": "v.", "definition": "give a rank or place within a grading system" },
+            { "word": "reckless", "part_of_speech": "adj.", "definition": "(of a person or their actions) without thinking or caring about the consequences of an action" },
+            { "word": "spat", "part_of_speech": "n.", "definition": "a light quarrel" },
+            { "word": "spat", "part_of_speech": "v.", "definition": "past tense of spit" },
+            { "word": "ripple", "part_of_speech": "n.", "definition": "a small wave or series of waves on the surface of water" },
+            { "word": "ripple", "part_of_speech": "v.", "definition": "(of water) form or flow with a series of small waves on the surface" },
+            { "word": "hollow", "part_of_speech": "adj.", "definition": "having a hole or empty space inside" },
+            { "word": "hollow", "part_of_speech": "n.", "definition": "a hole in something" },
+            { "word": "hollow", "part_of_speech": "v.", "definition": "form by making a hole" },
+            { "word": "lair", "part_of_speech": "n.", "definition": "a place where a wild animal, especially a fierce or dangerous one, lives" },
+            { "word": "snarl", "part_of_speech": "v.", "definition": "make an aggressive growl with bared teeth; say something in an angry, bad tempered voice" },
+            { "word": "snarl", "part_of_speech": "n.", "definition": "an act or sound of snarling" },
+            { "word": "brimming", "part_of_speech": "adj.", "definition": "to be filled to the brim" },
+            { "word": "acorn", "part_of_speech": "n.", "definition": "the fruit of the oak tree" },
+            { "word": "haul", "part_of_speech": "v.", "definition": "to pull or drag with force" },
+            { "word": "haul", "part_of_speech": "n.", "definition": "the action of pulling; heavy pull" },
+            { "word": "still", "part_of_speech": "adj.", "definition": "not moving or making a sound" },
+            { "word": "still", "part_of_speech": "n.", "definition": "deep silence and calm" },
+            { "word": "still", "part_of_speech": "adv.", "definition": "up to this time even now as formerly" },
+            { "word": "still", "part_of_speech": "v.", "definition": "make or become still" },
+            { "word": "gap", "part_of_speech": "n.", "definition": "a break or space in an object or between two objects; an unfilled space or interval; a break in continuity" },
+            { "word": "coo", "part_of_speech": "v.", "definition": "a soft murmur sound made by pigeons or doves" },
+            { "word": "coo", "part_of_speech": "n.", "definition": "a soft murmur sound made by pigeons or doves" },
+            { "word": "gnarled", "part_of_speech": "adj.", "definition": "covered with knots, twisted, and gnarls" },
+            { "word": "clan", "part_of_speech": "n.", "definition": "a group of people from the same bloodline, sharing the same surname, and normally living together" }
+        ];
+        
+        let usedIndices = [];
+        let currentIndex = getRandomIndex();
+        const card = document.getElementById('flashcard');
+        const frontFace = document.getElementById('front-face');
+        const backFace = document.getElementById('back-face');
+        const nextButton = document.getElementById('next-button');
+        
+        function getRandomIndex() {
+            if (usedIndices.length === words.length) {
+                usedIndices = [];
+            }
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * words.length);
+            } while (usedIndices.includes(randomIndex));
+            usedIndices.push(randomIndex);
+            return randomIndex;
+        }
+        
+        function showCard(index) {
+            const currentWord = words[index];
+            frontFace.innerHTML = `
+                <div>
+                    (${currentWord.part_of_speech}) ${currentWord.definition}
+                </div>`;
+            backFace.innerHTML = `<strong>${currentWord.word}</strong>`;
+        }
+
+        card.addEventListener('click', () => {
+            card.classList.toggle('flip');
+        });
+        
+        nextButton.addEventListener('click', () => {
+            if (card.classList.contains('flip')) {
+                card.classList.remove('flip');
+                setTimeout(() => {
+                    currentIndex = getRandomIndex();
+                    showCard(currentIndex);
+                }, 600);
+            } else {
+                currentIndex = getRandomIndex();
+                showCard(currentIndex);
+            }
+        });
+
+        // Show the first card on load
+        showCard(currentIndex);
+    </script>
+</body
