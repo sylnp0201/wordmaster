@@ -150,6 +150,7 @@
         
         let usedIndices = [];
         let currentIndex = getRandomIndex();
+        let lastBtnClick;
         const card = document.getElementById('flashcard');
         const frontFace = document.getElementById('front-face');
         const backFace = document.getElementById('back-face');
@@ -192,14 +193,20 @@
                 currentIndex = getRandomIndex();
                 showCard(currentIndex);
             }
+
+            lastBtnClick = 'next';
         });
         
         backButton.addEventListener('click', () => {
-        		if (usedIndices.length == 0) {
+            if (usedIndices.length == 0) {
             	return;
             }
+
+            if (lastBtnClick == 'next') {
+                usedIndices.pop(); // in this case, the last index is the current
+            }
+            previousIndex = usedIndices.pop();
             
-        		previousIndex = usedIndices.pop();
         
             if (card.classList.contains('flip')) {
                 card.classList.remove('flip');
@@ -209,6 +216,8 @@
             } else {
                 showCard(previousIndex);
             }
+
+            lastBtnClick = 'back';
         });
 
         // Show the first card on load
