@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -15,16 +13,23 @@
             background: #e3f2fd;
             margin: 0;
         }
+        .buttons {
+          margin-top: 20px;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+        }
         .card-container {
             position: relative;
             width: 390px;
-            height: 260px;
             perspective: 1000px;
+            display: flex;
+            flex-direction: column;
         }
         .card {
             width: 100%;
-            height: 100%;
-            position: absolute;
+            height: 300px;
+            position: relative;
             transform-style: preserve-3d;
             transition: transform 0.6s;
             cursor: pointer;
@@ -35,7 +40,7 @@
         .card-face {
             position: absolute;
             width: 100%;
-            height: 100%;
+            height: 300px;
             backface-visibility: hidden;
             display: flex;
             flex-direction: column;
@@ -59,10 +64,8 @@
             background: #ffcc80;
             color: #bf360c;
         }
-        .next-button {
-            position: absolute;
-            bottom: -50px;
-            right: 0;
+        .button {
+            position: relative;
             background: #007bff;
             color: white;
             padding: 10px 15px;
@@ -74,14 +77,6 @@
         @media (max-width: 480px) {
             .card-container {
                 width: 90%;
-                height: auto;
-            }
-            .card-face {
-                font-size: 1rem;
-                padding: 15px;
-            }
-            .next-button {
-                bottom: -40px;
             }
         }
     </style>
@@ -89,11 +84,18 @@
 </head>
 <body>
     <div class="card-container">
-        <div class="card" id="flashcard">
-            <div class="card-face front" id="front-face"></div>
-            <div class="card-face back" id="back-face"></div>
+        <div class="card" id="flashcard" style="">
+            <div class="card-face front" id="front-face">
+                <div>
+                    (v.) act in a traditional masked mime or a mummers' play
+                </div></div>
+            <div class="card-face back" id="back-face"><strong>mum</strong></div>
         </div>
-        <button class="next-button" id="next-button">Next</button>
+        <div class="buttons">
+          <button class="button back-button" id="back-button">Back</button>
+          <button class="button next-button" id="next-button">Next</button>
+        </div>
+        
     </div>
     <script>
         const words = [
@@ -146,6 +148,7 @@
         const frontFace = document.getElementById('front-face');
         const backFace = document.getElementById('back-face');
         const nextButton = document.getElementById('next-button');
+        const backButton = document.getElementById('back-button');
         
         function getRandomIndex() {
             if (usedIndices.length === words.length) {
@@ -184,8 +187,25 @@
                 showCard(currentIndex);
             }
         });
+        
+        backButton.addEventListener('click', () => {
+        		if (usedIndices.length == 0) {
+            	return;
+            }
+            
+        		previousIndex = usedIndices.pop();
+        
+            if (card.classList.contains('flip')) {
+                card.classList.remove('flip');
+                setTimeout(() => {
+                    showCard(previousIndex);
+                }, 600);
+            } else {
+                showCard(previousIndex);
+            }
+        });
 
         // Show the first card on load
         showCard(currentIndex);
     </script>
-</body
+</body></html>
