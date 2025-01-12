@@ -7,6 +7,10 @@ body {
     background: #e3f2fd;
     margin: 0;
 }
+
+.control-pannel {
+    margin-top: 2em;
+}
 .buttons {
   margin-top: 20px;
   display: flex;
@@ -53,7 +57,6 @@ body {
     color: #0d47a1;
 }
 .card-face.back {
-    font-size: 40px;
     transform: rotateY(180deg);
     background: #ffcc80;
     color: #bf360c;
