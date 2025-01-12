@@ -178,7 +178,7 @@
 
     document.querySelectorAll('.wordset input[type="radio"]').forEach(radioButton => {
         radioButton.addEventListener('change', function() {
-            initWords();
+            init();
         });
     });
 
