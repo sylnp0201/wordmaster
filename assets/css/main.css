@@ -1,0 +1,77 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #e3f2fd;
+    margin: 0;
+}
+.buttons {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.card-container {
+    position: relative;
+    width: 390px;
+    perspective: 1000px;
+    display: flex;
+    flex-direction: column;
+}
+.card {
+    width: 100%;
+    height: 300px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+}
+.card.flip {
+    transform: rotateY(180deg);
+}
+.card-face {
+    position: absolute;
+    width: 100%;
+    height: 300px;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 1.25rem;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.card-face.front {
+    background: #90caf9;
+    color: #0d47a1;
+}
+.card-face.back {
+    font-size: 40px;
+    transform: rotateY(180deg);
+    background: #ffcc80;
+    color: #bf360c;
+}
+.button {
+    position: relative;
+    background: #007bff;
+    font-size: 16px;
+    padding: 10px 15px;
+    width: 100px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+@media (max-width: 480px) {
+    .card-container {
+        width: 90%;
+    }
+}
