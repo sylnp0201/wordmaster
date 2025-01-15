@@ -49,7 +49,7 @@
 
     const grade_3_words = [
         { "word": "knapsack", "part_of_speech": "n.", "definition": "a bag with two straps worn on your back or over your shoulder to carry supplies" },
-        { "word": "slink", "v.": "", "definition": "walk stealthily; move smoothly and quietly with gliding steps." },
+        { "word": "slink", "part_of_speech": "v.", "definition": "walk stealthily; move smoothly and quietly with gliding steps." },
         { "word": "chockablock", "part_of_speech": "adj.", "definition": "packed full to capacity; crowded; completely filled;" },
         { "word": "chockablock", "part_of_speech": "adv.", "definition": "extremely (full)" },
         { "word": "filly", "part_of_speech": "n.", "definition": "(animals) a female horse or pony under the age of four; a girl or a young women;" },
@@ -110,7 +110,7 @@
 
     function showCard(index) {
         const currentWord = words[index];
-        const wordHtml = `<div class="display-4">${currentWord.word}</div>`;
+        const wordHtml = `<div class="display-4">${currentWord.word} (${currentWord.part_of_speech})</div>`;
         const defHtml = `
             <div>
                 (${currentWord.part_of_speech}) ${currentWord.definition}
