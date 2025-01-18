@@ -62,12 +62,12 @@
     const backFace = document.getElementById('back-face');
     const nextButton = document.getElementById('next-button');
     const backButton = document.getElementById('back-button');
-    const indexHistory = []
     let unUsedIndices;
     let word_on_front;
     let words;
     let currentIndex;
     let lastBtnClick;
+    let totalCount;
 
 
     function init() {
@@ -77,38 +77,28 @@
             words = [...grade_3_words];
         }
 
+        totalCount = words.length;
+        shuffleArray(words);
+
         word_on_front = document.getElementById('wordfront').checked;
-        indexHistory.length = 0;
         unUsedIndices = Array.from({ length: words.length }, (_, i) => i);
 
-        currentIndex = getNextIndex();
-        showCard(currentIndex);
+        currentIndex = 0;
+        renderCard(currentIndex);
     }
-    
-    function getRandomIndex() {
-        if (unUsedIndices.length === 0) {
-            throw Error("No more un-used words!");
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i >= 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
         }
-
-        const randomIndex = Math.floor(Math.random() * unUsedIndices.length);
-        return unUsedIndices[randomIndex];
     }
 
-    function getNextIndex() {
-        if (unUsedIndices.length === 0) {
-            unUsedIndices = Array.from({ length: words.length }, (_, i) => i);
-        }
-
-        currentIndex = getRandomIndex();
-        indexHistory.push(currentIndex);
-        unUsedIndices = unUsedIndices.filter(function(item) {
-            return item !== currentIndex
-        });
-
-        return currentIndex;
+    function updateCounter() {
+        const counter = document.querySelector(".counter").innerHTML = `${currentIndex+1}/${totalCount}`;
     }
 
-    function showCard(index) {
+    function setCardHTML(index) {
         const currentWord = words[index];
         const wordHtml = `<div class="display-4">${currentWord.word} (${currentWord.part_of_speech})</div>`;
         const defHtml = `
@@ -125,54 +115,53 @@
         }
     }
 
+    function renderCard(index) {
+        if (card.classList.contains('flip')) {
+            card.classList.remove('flip');
+            setTimeout(() => {
+                setCardHTML(index);
+            }, 600);
+        } else {
+            setCardHTML(index);
+        }
+        updateCounter();
+    }
+
+    function onclickNext() {
+        if (currentIndex == totalCount - 1) {
+            shuffleArray(words);
+            currentIndex = 0;
+        } else {
+            currentIndex++;
+        }
+        
+        renderCard(currentIndex);
+        lastBtnClick = 'next';
+    }
+
+    function onclickBack() {
+        if (currentIndex == 0) {
+            return;
+        }
+
+        currentIndex--;
+        renderCard(currentIndex);
+        lastBtnClick = 'back';
+    }
+
     card.addEventListener('click', () => {
         card.classList.toggle('flip');
     });
     
-    nextButton.addEventListener('click', () => {
-        if (card.classList.contains('flip')) {
-            card.classList.remove('flip');
-            setTimeout(() => {
-                currentIndex = getNextIndex();
-                showCard(currentIndex);
-            }, 600);
-        } else {
-            currentIndex = getNextIndex();
-            showCard(currentIndex);
-        }
-
-        lastBtnClick = 'next';
-    });
-    
-    backButton.addEventListener('click', () => {
-        if (indexHistory.length == 0) {
-            return;
-        }
-
-        if (lastBtnClick == 'next') {
-            // In this case, the immediate last index is the current. We do an extra pop to find the previous index
-            indexHistory.pop(); 
-        }
-        previousIndex = indexHistory.pop();
-    
-        if (card.classList.contains('flip')) {
-            card.classList.remove('flip');
-            setTimeout(() => {
-                showCard(previousIndex);
-            }, 600);
-        } else {
-            showCard(previousIndex);
-        }
-
-        lastBtnClick = 'back';
-    });
+    nextButton.addEventListener('click', onclickNext);
+    backButton.addEventListener('click', onclickBack);
 
     document.querySelectorAll('.card-front input[type="radio"]').forEach(radioButton => {
         radioButton.addEventListener('change', function() {
             if (this.checked) {
                 word_on_front = this.value === "word";
             }
-            showCard(currentIndex);
+            renderCard(currentIndex);
         });
     });
 

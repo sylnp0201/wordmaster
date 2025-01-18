@@ -73,6 +73,12 @@ body {
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+.counter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 @media (max-width: 480px) {
     .card-container {
         width: 90%;
