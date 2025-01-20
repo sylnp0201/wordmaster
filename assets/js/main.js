@@ -55,6 +55,16 @@
         { "word": "filly", "part_of_speech": "n.", "definition": "(animals) a female horse or pony under the age of four; a girl or a young women;" },
         { "word": "tote", "part_of_speech": "n.", "definition": "a tote bag" },
         { "word": "tote", "part_of_speech": "v.", "definition": "to carry, convey, or drag" },
+        { "word": "trample", "part_of_speech": "v.", "definition": "to stamp or walk roughly (on)" },
+        { "word": "eavesdropper", "part_of_speech": "n.", "definition": "Someone who listens to a private conversation without the knowledge of the people involved." },
+        { "word": "eavesdrop", "part_of_speech": "v.", "definition": "To listen secretly to the private conversation of others" },
+        { "word": "stampede", "part_of_speech": "n.", "definition": "A sudden frenzied rush of panic-stricken animals" },
+        { "word": "stampede", "part_of_speech": "v.", "definition": "To rush wildly in a sudden panic" },
+        { "word": "dash", "part_of_speech": "n.", "definition": "An act of running somewhere suddenly" },
+        { "word": "dash", "part_of_speech": "v.", "definition": "Run or travel somewhere in a rush" },
+        { "word": "lope", "part_of_speech": "n.", "definition": "A long steady gait or stride" },
+        { "word": "lope", "part_of_speech": "v.", "definition": "Run or move with a long bounding stride" },
+        { "word": "knotty", "part_of_speech": "adj.", "definition": "Full of knots; Difficult to understand or solve" },
     ];
 
     const card = document.getElementById('flashcard');
