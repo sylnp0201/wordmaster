@@ -65,7 +65,18 @@
         { "word": "lope", "part_of_speech": "n.", "definition": "A long steady gait or stride" },
         { "word": "lope", "part_of_speech": "v.", "definition": "Run or move with a long bounding stride" },
         { "word": "knotty", "part_of_speech": "adj.", "definition": "Full of knots; Difficult to understand or solve" },
+        { "word": "heifer", "part_of_speech": "n.", "definition": "A young cow, especially one that has not yet given birth to a calf" },
+        { "word": "swarm", "part_of_speech": "n.", "definition": "A large number of insects, especially when in motion" },
+        { "word": "swarm", "part_of_speech": "v.", "definition": "Move about or proceed in large numbers" },
+        { "word": "numb", "part_of_speech": "adj.", "definition": "Deprived of the power to feel or move normally" },
+        { "word": "numb", "part_of_speech": "v.", "definition": "To make insensitive or lacking sensation" },
+        { "word": "kin", "part_of_speech": "n.", "definition": "One's family and relatives" },
+        { "word": "kin", "part_of_speech": "adj.", "definition": "Related genetically or in the same family" },
+        { "word": "lug", "part_of_speech": "n.", "definition": "A box for shipping fruit or vegetables" },
+        { "word": "lug", "part_of_speech": "v.", "definition": "To drag or haul (an object) laboriously; To pull or drag with short jerks" },
+        { "word": "smudged", "part_of_speech": "v.", "definition": "(past tense) Cause something to be messily smeared by rubbing it." },
     ];
+    // { "word": "", "part_of_speech": ".", "definition": "" },
 
     const card = document.getElementById('flashcard');
     const frontFace = document.getElementById('front-face');
