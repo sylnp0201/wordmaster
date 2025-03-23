@@ -1,5 +1,5 @@
 (function() {
-    const grade_2_words = [
+    const fall_2024_words = [
         { "word": "feast", "part_of_speech": "n.", "definition": "a large meal, typically one in celebration of something" },
         { "word": "feast", "part_of_speech": "v.", "definition": "eat and drink sumptuously" },
         { "word": "shove", "part_of_speech": "v.", "definition": "to push someone or something in a rough way" },
@@ -47,7 +47,7 @@
         { "word": "clan", "part_of_speech": "n.", "definition": "a group of people with a strong common interest" }
     ];
 
-    const grade_3_words = [
+    const winter_2024_words = [
         { "word": "knapsack", "part_of_speech": "n.", "definition": "a bag with two straps worn on your back or over your shoulder to carry supplies" },
         { "word": "slink", "part_of_speech": "v.", "definition": "walk stealthily; move smoothly and quietly with gliding steps." },
         { "word": "chockablock", "part_of_speech": "adj.", "definition": "packed full to capacity; crowded; completely filled;" },
@@ -89,6 +89,50 @@
         { "word": "shamble", "part_of_speech": "n.", "definition": "A shuffling gait" },
         { "word": "gait", "part_of_speech": "n.", "definition": "Manner of walking, stepping, or running; the ways a horse moves" },
     ];
+
+    const spring_2025_words = [
+        { "word": "glint", "part_of_speech": "v.", "definition": "To gleam or give out small flashes of light, usually by reflection" },
+        { "word": "glint", "part_of_speech": "n.", "definition": "A momentary flash of light; a sparkle; A faint or fleeting indication" },
+        { "word": "shuffle", "part_of_speech": "v.", "definition": "To move with short sliding steps, without or barely lifting the feet; To mix playing cards, tiles, or dominoes together so as to make their order random." },
+        { "word": "shuffle", "part_of_speech": "n.", "definition": "A short sliding step or movement, or a walk characterized by such steps" },
+        { "word": "frosty", "part_of_speech": "adj.", "definition": "Cold enough for frost; Covered with frost" },
+        { "word": "horde", "part_of_speech": "n.", "definition": "A large group or crowd; a swarm" },
+        { "word": "horde", "part_of_speech": "v.", "definition": "To gather in a horde" },
+        { "word": "tremble", "part_of_speech": "v.", "definition": "To shake involuntarily, as from excitement or anger; quake; To feel fear or anxiety; To vibrate or quiver" },
+        { "word": "tremble", "part_of_speech": "n.", "definition": "The act or an instance of trembling" },
+        { "word": "gritty", "part_of_speech": "adj.", "definition": "Showing resolution and fortitude; plucky; Containing, covered with, or resembling grit" },
+        { "word": "aerie", "part_of_speech": "n.", "definition": "The nest of a bird, such as an eagle, built on a cliff or other high place." },
+        { "word": "fling", "part_of_speech": "n.", "definition": "The act or an instance of flinging; toss; throw" },
+        { "word": "fling", "part_of_speech": "v.", "definition": "To throw with force; To throw/cast aside" },
+        { "word": "molten", "part_of_speech": "adj.", "definition": "Made liquid by heat; melted" },
+        { "word": "molten", "part_of_speech": "v.", "definition": "The past participle of melt; Made by melting and casting in a mold" },
+        { "word": "lodge", "part_of_speech": "n.", "definition": "A place to live in make or become firmly fixed; a den of an animal" },
+        { "word": "lodge", "part_of_speech": "v.", "definition": "To live in a place temporarily.; To rent accommodations, especially for sleeping" },
+        { "word": "flinch", "part_of_speech": "n.", "definition": "An act or instance of starting, wincing, or recoiling" },
+        { "word": "flinch", "part_of_speech": "v.", "definition": "To start or wince involuntarily, as from surprise or pain; To recoil, as from something unpleasant or difficult; shrink" },
+        { "word": "deserted", "part_of_speech": "adj.", "definition": "No longer occupied or used; abandoned" },
+        { "word": "fleece", "part_of_speech": "v.", "definition": "To strip money or belongings" },
+        { "word": "fleece", "part_of_speech": "n.", "definition": "The coat of wool of a sheep or similar animal; A soft woolly covering or mass" },
+        { "word": "hurl", "part_of_speech": "v.", "definition": "To throw with great force; fling; To send with great vigor; thrust" },
+        { "word": "hurl", "part_of_speech": "n.", "definition": "A forcible or violent throw; fling" },
+        { "word": "downy", "part_of_speech": "adj.", "definition": "Covered with soft fine hair or feathers; light, soft, and fluffy" },
+        { "word": "chatter", "part_of_speech": "v.", "definition": "To talk rapidly, incessantly, and on trivial subjects; jabbe" },
+        { "word": "chatter", "part_of_speech": "n.", "definition": "Idle or foolish talk; gossip" },
+        { "word": "spark", "part_of_speech": "v.", "definition": "To emit or produce sparks" },
+        { "word": "spark", "part_of_speech": "n.", "definition": "A small bit of fire; A flash of light" },
+        { "word": "misty", "part_of_speech": "adj.", "definition": "Consisting of or marked by mist; not clearly seen or outlined" },
+        { "word": "shin", "part_of_speech": "n.", "definition": "The front part of the leg below the knee and above the ankle" },
+        { "word": "shin", "part_of_speech": "v.", "definition": "To climb (a rope or pole, for example) by gripping and pulling alternately with the hands and legs." },
+        { "word": "throb", "part_of_speech": "v.", "definition": "To beat rapidly or violently, as the heart; pound." },
+        { "word": "throb", "part_of_speech": "n.", "definition": "A beating, pulsating, or vibration." },
+        { "word": "petty", "part_of_speech": "adj.", "definition": "Of small importance; trivial" },
+        { "word": "forearm", "part_of_speech": "n.", "definition": "The part of the arm between the wrist and the elbow" },
+        { "word": "babble", "part_of_speech": "n.", "definition": "Meaningless talk or sounds" },
+        { "word": "babble", "part_of_speech": "v.", "definition": "To utter a meaningless confusion of words or sounds; To talk foolishly or idly; chatter" },
+        { "word": "puny", "part_of_speech": "adj.", "definition": "Of inferior size, strength, or significance; weak" },
+        { "word": "stockpile", "part_of_speech": "n.", "definition": "A supply stored for future use, usually carefully accrued and maintained" },
+        { "word": "stockpile", "part_of_speech": "v.", "definition": "To acquire and store a large quantity of (something)" },
+    ];
     // { "word": "", "part_of_speech": ".", "definition": "" },
 
     const card = document.getElementById('flashcard');
@@ -106,9 +150,9 @@
 
     function init() {
         if(document.getElementById('words-all').checked) {
-            words = [...grade_2_words, ...grade_3_words];
-        } else if(document.getElementById('words-3').checked) {
-            words = [...grade_3_words];
+            words = [...fall_2024_words, ...winter_2024_words, ...spring_2025_words];
+        } else if(document.getElementById('words-latest').checked) {
+            words = [...spring_2025_words];
         }
 
         totalCount = words.length;
