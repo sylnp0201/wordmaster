@@ -8,7 +8,7 @@
         { "word": "fir", "part_of_speech": "n.", "definition": "an evergreen coniferous tree with upright cones and flat needle-shaped leaves, typically arranged in two rows." },
         { "word": "pause", "part_of_speech": "v.", "definition": "interrupt action or speech briefly" },
         { "word": "pause", "part_of_speech": "n.", "definition": "a temporary stop in action or speech" },
-        { "word": "mum", "part_of_speech": "v.", "definition": "call for silence;" },
+        { "word": "mum", "part_of_speech": "v.", "definition": "call for silence" },
         { "word": "mum", "part_of_speech": "adj.", "definition": "silent; not saying a word" },
         { "word": "pride", "part_of_speech": "n.", "definition": "a feeling of deep pleasure derived from one’s own achievements" },
         { "word": "pride", "part_of_speech": "v.", "definition": "be especially proud of a quality or skill" },
@@ -106,7 +106,7 @@
         { "word": "fling", "part_of_speech": "v.", "definition": "To throw with force; To throw/cast aside" },
         { "word": "molten", "part_of_speech": "adj.", "definition": "Made liquid by heat; melted" },
         { "word": "molten", "part_of_speech": "v.", "definition": "The past participle of melt; Made by melting and casting in a mold" },
-        { "word": "lodge", "part_of_speech": "n.", "definition": "A place to live in make or become firmly fixed; a den of an animal" },
+        { "word": "lodge", "part_of_speech": "n.", "definition": "A place to live in; a den of an animal" },
         { "word": "lodge", "part_of_speech": "v.", "definition": "To live in a place temporarily.; To rent accommodations, especially for sleeping" },
         { "word": "flinch", "part_of_speech": "n.", "definition": "An act or instance of starting, wincing, or recoiling" },
         { "word": "flinch", "part_of_speech": "v.", "definition": "To start or wince involuntarily, as from surprise or pain; To recoil, as from something unpleasant or difficult; shrink" },
@@ -116,7 +116,7 @@
         { "word": "hurl", "part_of_speech": "v.", "definition": "To throw with great force; fling; To send with great vigor; thrust" },
         { "word": "hurl", "part_of_speech": "n.", "definition": "A forcible or violent throw; fling" },
         { "word": "downy", "part_of_speech": "adj.", "definition": "Covered with soft fine hair or feathers; light, soft, and fluffy" },
-        { "word": "chatter", "part_of_speech": "v.", "definition": "To talk rapidly, incessantly, and on trivial subjects; jabbe" },
+        { "word": "chatter", "part_of_speech": "v.", "definition": "To talk rapidly, incessantly, and on trivial subjects; jabber" },
         { "word": "chatter", "part_of_speech": "n.", "definition": "Idle or foolish talk; gossip" },
         { "word": "spark", "part_of_speech": "v.", "definition": "To emit or produce sparks" },
         { "word": "spark", "part_of_speech": "n.", "definition": "A small bit of fire; A flash of light" },
@@ -140,12 +140,12 @@
     const backFace = document.getElementById('back-face');
     const nextButton = document.getElementById('next-button');
     const backButton = document.getElementById('back-button');
-    let unUsedIndices;
     let word_on_front;
     let words;
     let currentIndex;
-    let lastBtnClick;
     let totalCount;
+    
+    const FLIP_ANIMATION_DURATION = 600;
 
 
     function init() {
@@ -159,8 +159,6 @@
         shuffleArray(words);
 
         word_on_front = document.getElementById('wordfront').checked;
-        unUsedIndices = Array.from({ length: words.length }, (_, i) => i);
-
         currentIndex = 0;
         renderCard(currentIndex);
     }
@@ -173,7 +171,7 @@
     }
 
     function updateCounter() {
-        const counter = document.querySelector(".counter").innerHTML = `${currentIndex+1}/${totalCount}`;
+        document.querySelector(".counter").innerHTML = `${currentIndex+1}/${totalCount}`;
     }
 
     function setCardHTML(index) {
@@ -198,7 +196,7 @@
             card.classList.remove('flip');
             setTimeout(() => {
                 setCardHTML(index);
-            }, 600);
+            }, FLIP_ANIMATION_DURATION);
         } else {
             setCardHTML(index);
         }
@@ -214,7 +212,6 @@
         }
         
         renderCard(currentIndex);
-        lastBtnClick = 'next';
     }
 
     function onclickBack() {
@@ -224,7 +221,6 @@
 
         currentIndex--;
         renderCard(currentIndex);
-        lastBtnClick = 'back';
     }
 
     card.addEventListener('click', () => {
