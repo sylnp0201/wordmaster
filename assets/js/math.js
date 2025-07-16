@@ -5,8 +5,7 @@
     const backFace = document.getElementById('back-face');
     const nextButton = document.getElementById('next-button');
     const backButton = document.getElementById('back-button');
-    let word_on_front;
-    let words;
+    let questions;
     let currentIndex;
     let totalCount;
     
@@ -14,16 +13,15 @@
 
 
     function init() {
-        if(document.getElementById('words-all').checked) {
-            words = [...vocabularyData.fall_2024, ...vocabularyData.winter_2024, ...vocabularyData.spring_2025];
-        } else if(document.getElementById('words-latest').checked) {
-            words = [...vocabularyData.spring_2025];
+        if(document.getElementById('grades-all').checked) {
+            questions = [...mathData.grade1, ...mathData.grade2, ...mathData.grade3];
+        } else if(document.getElementById('grades-latest').checked) {
+            questions = [...mathData.grade3];
         }
 
-        totalCount = words.length;
-        shuffleArray(words);
+        totalCount = questions.length;
+        shuffleArray(questions);
 
-        word_on_front = document.getElementById('wordfront').checked;
         currentIndex = 0;
         renderCard(currentIndex);
     }
@@ -40,20 +38,16 @@
     }
 
     function setCardHTML(index) {
-        const currentWord = words[index];
-        const wordHtml = `<div class="display-4">${currentWord.word} (${currentWord.part_of_speech})</div>`;
-        const defHtml = `
+        const currentQuestion = questions[index];
+        const questionHtml = `<div class="display-5">${currentQuestion.question}</div>`;
+        const answerHtml = `
             <div>
-                (${currentWord.part_of_speech}) ${currentWord.definition}
+                <div class="display-5">${currentQuestion.answer}</div>
+                <div class="mt-2 text-muted">${currentQuestion.topic}</div>
             </div>`;
 
-        if (word_on_front) {
-            frontFace.innerHTML = wordHtml;
-            backFace.innerHTML = defHtml;
-        } else {
-            frontFace.innerHTML = defHtml;
-            backFace.innerHTML = wordHtml;
-        }
+        frontFace.innerHTML = questionHtml;
+        backFace.innerHTML = answerHtml;
     }
 
     function renderCard(index) {
@@ -70,7 +64,7 @@
 
     function onclickNext() {
         if (currentIndex == totalCount - 1) {
-            shuffleArray(words);
+            shuffleArray(questions);
             currentIndex = 0;
         } else {
             currentIndex++;
@@ -95,16 +89,7 @@
     nextButton.addEventListener('click', onclickNext);
     backButton.addEventListener('click', onclickBack);
 
-    document.querySelectorAll('.card-front input[type="radio"]').forEach(radioButton => {
-        radioButton.addEventListener('change', function() {
-            if (this.checked) {
-                word_on_front = this.value === "word";
-            }
-            renderCard(currentIndex);
-        });
-    });
-
-    document.querySelectorAll('.wordset input[type="radio"]').forEach(radioButton => {
+    document.querySelectorAll('.gradeset input[type="radio"]').forEach(radioButton => {
         radioButton.addEventListener('change', function() {
             init();
         });

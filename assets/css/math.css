@@ -1,0 +1,5 @@
+/* Math-specific styles
+ * 
+ * To override main.css styles with higher specificity, use the .math-page class:
+ * Example: .math-page .card-face.front { custom styles here }
+ */
