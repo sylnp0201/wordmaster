@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>Soccer Card - Roselyn</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            transition: background-color 0.5s ease;
+        }
+
+        .card-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .number-display {
+            font-size: 50vh;
+            font-weight: 900;
+            line-height: 1;
+            color: white;
+            -webkit-text-stroke: 8px black;
+            text-stroke: 8px black;
+            paint-order: stroke fill;
+            text-shadow:
+                -6px -6px 0 #000,
+                6px -6px 0 #000,
+                -6px 6px 0 #000,
+                6px 6px 0 #000,
+                -8px 0 0 #000,
+                8px 0 0 #000,
+                0 -8px 0 #000,
+                0 8px 0 #000;
+            user-select: none;
+        }
+
+        .settings-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .settings-button:hover {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .settings-panel {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            min-width: 250px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+
+        .settings-panel.show {
+            display: block;
+        }
+
+        .settings-panel label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .settings-panel input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .settings-panel button {
+            width: 100%;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .settings-panel button:hover {
+            background: #0056b3;
+        }
+
+        .pause-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .pause-button:hover {
+            background: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="card-display">
+        <div class="number-display" id="number-display">1</div>
+    </div>
+
+    <button class="settings-button" id="settings-button">Settings</button>
+
+    <div class="settings-panel" id="settings-panel">
+        <label for="interval-input">Change Interval (seconds):</label>
+        <input type="number" id="interval-input" min="1" max="60" value="3" />
+        <button id="apply-button">Apply</button>
+    </div>
+
+    <button class="pause-button" id="pause-button">Pause</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        (function() {
+            // 7 background color options
+            const colors = [
+                '#FF0000', // Red
+                '#0000FF', // Blue
+                '#00FF00', // Green
+                '#FFA500', // Orange
+                '#FFFF00', // Yellow
+                '#FF10F0', // Pink
+            ];
+
+            let interval = 3000; // Default 3 seconds
+            let intervalId = null;
+            let isPaused = false;
+
+            const numberDisplay = document.getElementById('number-display');
+            const settingsButton = document.getElementById('settings-button');
+            const settingsPanel = document.getElementById('settings-panel');
+            const intervalInput = document.getElementById('interval-input');
+            const applyButton = document.getElementById('apply-button');
+            const pauseButton = document.getElementById('pause-button');
+
+            function getRandomNumber(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            function getRandomColor() {
+                return colors[getRandomNumber(0, colors.length - 1)];
+            }
+
+            function updateDisplay() {
+                const number = getRandomNumber(1, 20);
+                const bgColor = getRandomColor();
+
+                document.body.style.backgroundColor = bgColor;
+                numberDisplay.textContent = number;
+            }
+
+            function startAutoChange() {
+                if (intervalId) {
+                    clearInterval(intervalId);
+                }
+                intervalId = setInterval(updateDisplay, interval);
+            }
+
+            function togglePause() {
+                isPaused = !isPaused;
+                if (isPaused) {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                    pauseButton.textContent = 'Resume';
+                } else {
+                    startAutoChange();
+                    pauseButton.textContent = 'Pause';
+                }
+            }
+
+            // Settings toggle
+            settingsButton.addEventListener('click', () => {
+                settingsPanel.classList.toggle('show');
+            });
+
+            // Apply new interval
+            applyButton.addEventListener('click', () => {
+                const newInterval = parseInt(intervalInput.value);
+                if (newInterval >= 1 && newInterval <= 60) {
+                    interval = newInterval * 1000;
+                    if (!isPaused) {
+                        startAutoChange();
+                    }
+                    settingsPanel.classList.remove('show');
+                }
+            });
+
+            // Pause/Resume toggle
+            pauseButton.addEventListener('click', togglePause);
+
+            // Click anywhere on the display to manually change
+            numberDisplay.addEventListener('click', () => {
+                if (isPaused) {
+                    updateDisplay();
+                }
+            });
+
+            // Initialize
+            updateDisplay();
+            startAutoChange();
+        })();
+    </script>
+</body>
+</html>

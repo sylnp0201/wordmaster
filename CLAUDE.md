@@ -4,53 +4,82 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Word Master is a vocabulary flashcard application built for elementary school students, specifically designed for 3rd grade vocabulary learning. The application displays vocabulary words with their definitions, parts of speech, and allows users to flip between word and definition views.
+Word Master is a dual-purpose flashcard application for elementary school students, supporting both vocabulary learning and math practice. The application uses interactive flashcards with flip animations to display questions and answers.
 
 ## Architecture
 
-This is a vanilla HTML/CSS/JavaScript application with no build system or package dependencies:
+This is a vanilla HTML/CSS/JavaScript application with no build system or package dependencies. The codebase consists of two parallel applications sharing common styling:
 
-- **index.html**: Main application entry point with Bootstrap UI components
-- **assets/css/main.css**: Custom styling for flashcard animations and responsive design
-- **assets/js/main.js**: Core application logic containing word data and flashcard functionality
+### Vocabulary Application (index.html)
+- **index.html**: Entry point for vocabulary flashcards
+- **assets/data/vocabulary-data.js**: Contains vocabulary word sets organized by semester
+- **assets/js/main.js**: Application logic for vocabulary flashcards
+- **assets/css/main.css**: Shared styling for both applications
 
-## Key Components
+### Math Application (math.html)
+- **math.html**: Entry point for math flashcards
+- **assets/data/math-data.js**: Contains math questions organized by grade level
+- **assets/js/math.js**: Application logic for math flashcards
+- **assets/css/math.css**: Additional styling specific to math pages
 
-### Word Data Structure
-The application contains three word sets stored as JavaScript arrays in `main.js`:
-- `fall_2024_words`: Fall 2024 vocabulary set
-- `winter_2024_words`: Winter 2024 vocabulary set  
-- `spring_2025_words`: Spring 2025 vocabulary set (currently default)
+## Data Structure
 
-Each word object contains:
+### Vocabulary Data (vocabulary-data.js)
+The `vocabularyData` object contains three semester-based word sets:
+- `fall_2024`: Fall 2024 vocabulary
+- `winter_2024`: Winter 2024 vocabulary
+- `spring_2025`: Spring 2025 vocabulary (currently default)
+
+Each word object:
 ```javascript
 { "word": "example", "part_of_speech": "n.", "definition": "a representative sample" }
 ```
 
-### Core Functionality
-- **Card Flipping**: CSS 3D transforms create flip animation between word and definition
-- **Navigation**: Next/Back buttons with automatic shuffling when reaching end
-- **Settings**: Toggle between showing word or definition on front, select word sets
-- **Counter**: Displays current position in word set
+### Math Data (math-data.js)
+The `mathData` object contains three grade-level question sets:
+- `grade1`: Grade 1 math questions
+- `grade2`: Grade 2 math questions
+- `grade3`: Grade 3 math questions (currently default)
 
-### State Management
-Key global variables in `main.js`:
-- `words`: Current active word set
-- `currentIndex`: Position in current word set
-- `word_on_front`: Boolean for display preference
-- `unUsedIndices`: Array tracking word usage (currently unused)
+Each question object:
+```javascript
+{ "question": "What is 8 × 7?", "answer": "56", "topic": "Multiplication" }
+```
+
+## Shared Functionality
+
+Both applications follow the same pattern:
+
+- **Card Flipping**: CSS 3D transforms for flip animation between front and back
+- **Navigation**: Next/Back buttons with automatic reshuffling at end of deck
+- **Settings Panel**: Bootstrap accordion for configuration options
+- **Counter Display**: Shows current position in the deck (e.g., "3/20")
+- **Automatic Shuffling**: Fisher-Yates shuffle algorithm on initialization and deck completion
+
+### Vocabulary-Specific Features
+- Toggle to display word or definition on card front
+- Part of speech displayed with both word and definition
+
+### Math-Specific Features
+- Question always on front, answer on back
+- Topic label displayed with answer
 
 ## Development
 
-Since this is a static web application with no build process:
-- Open `index.html` directly in a browser for testing
-- No installation or build commands required
-- Uses CDN resources for Bootstrap and Font Awesome
+No build process required:
+- Open `index.html` or `math.html` directly in browser
+- Uses CDN resources for Bootstrap 5.3.3
 
-## Adding New Words
+## Adding Content
 
-To add vocabulary words, modify the appropriate word array in `assets/js/main.js`. Follow the existing structure with word, part_of_speech, and definition fields.
+### Adding Vocabulary Words
+Edit `assets/data/vocabulary-data.js` and add entries to the appropriate semester array.
 
-## Current Word Set Default
+### Adding Math Questions
+Edit `assets/data/math-data.js` and add entries to the appropriate grade level array.
 
-The application defaults to Spring 2025 words (`words-latest` radio button checked). To change the default, modify the `checked` attribute in the HTML radio buttons in `index.html:57`.
+## Configuration
+
+Default selections are controlled by `checked` attributes in HTML:
+- Vocabulary defaults to Spring 2025: `index.html:56`
+- Math defaults to Grade 3: `math.html:42`
