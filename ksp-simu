@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Rocket Orbit Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #010103; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        canvas { display: block; }
+        .ui-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00ff00;
+            pointer-events: none;
+            text-shadow: 1px 1px 2px black;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .panel {
+            background: rgba(0, 15, 0, 0.85);
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            padding: 10px;
+            border-radius: 4px;
+            backdrop-filter: blur(8px);
+            width: 220px;
+        }
+        .controls-hint {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: #ccc;
+            background: rgba(0,0,0,0.85);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            border: 1px solid #444;
+        }
+        .label-ap { color: #ff5555; font-weight: bold; }
+        .label-pe { color: #55aaff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="ui-overlay">
+        <div class="panel">
+            <h1 class="text-[10px] font-bold mb-2 uppercase tracking-widest text-green-500">Telemetry</h1>
+            <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-xs font-mono">
+                <span class="text-green-900">ALT</span> <span id="alt-val">0 km</span>
+                <span class="text-green-900">VEL</span> <span id="vel-val">0 m/s</span>
+                <span class="text-green-900">ENG</span> <span id="eng-val">OFF</span>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h1 class="text-[10px] font-bold mb-2 uppercase tracking-widest text-blue-400">Orbit Info</h1>
+            <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-xs font-mono">
+                <span class="text-blue-900">APOAPSIS</span> <span id="ap-val" class="label-ap">---</span>
+                <span class="text-blue-900">PERIAPSIS</span> <span id="pe-val" class="label-pe">---</span>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h1 class="text-[10px] font-bold mb-1 uppercase tracking-widest text-white/50">Time Control</h1>
+            <div class="flex items-center justify-between">
+                <span id="warp-label" class="text-lg font-mono">1x</span>
+                <span id="pause-indicator" class="text-[10px] bg-red-600 px-1 rounded text-white hidden">PAUSED</span>
+            </div>
+        </div>
+        
+        <div id="orbit-status" class="text-[10px] font-bold bg-black/50 p-2 rounded border border-white/10 uppercase tracking-tighter">
+            Pre-Launch
+        </div>
+    </div>
+
+    <div class="controls-hint">
+        <b>Z</b>: Engine | <b>A/D or Arrows</b>: Steer | <b>Space</b>: Pause | <b>&lt; / &gt;</b>: Time Warp
+    </div>
+
+    <canvas id="simCanvas"></canvas>
+
+    <script>
+        const G = 6.67430e-11;
+        const EARTH_MASS = 5.972e24;
+        const EARTH_RADIUS = 6371000;
+        const ATMOSPHERE_HEIGHT = 240000; 
+        const SEA_LEVEL_DENSITY = 1.225;
+        
+        let zoom = 0.0005; 
+        let isPaused = false;
+        let warpIndex = 0;
+        const warpRates = [1, 2, 5, 10, 50, 100, 500, 1000, 5000];
+        
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const rocket = {
+            x: 0,
+            y: -EARTH_RADIUS, 
+            vx: 0,
+            vy: 0,
+            angle: -Math.PI / 2,
+            thrust: 56, 
+            engineOn: false,
+            rotationSpeed: 0.025,
+            mass: 1000,
+            dragCoeff: 0.1
+        };
+
+        const stars = Array.from({length: 1000}, () => ({
+            x: Math.random(),
+            y: Math.random(),
+            s: Math.random() * 1.2 + 0.3,
+            o: Math.random()
+        }));
+
+        const keys = {};
+        window.addEventListener('keydown', e => {
+            keys[e.code] = true;
+            if (e.code === 'KeyZ') rocket.engineOn = !rocket.engineOn;
+            if (e.code === 'Space') {
+                isPaused = !isPaused;
+                document.getElementById('pause-indicator').style.display = isPaused ? 'block' : 'none';
+            }
+            if (e.code === 'Period' || e.code === 'Slash') warpIndex = Math.min(warpIndex + 1, warpRates.length - 1);
+            if (e.code === 'Comma') warpIndex = Math.max(warpIndex - 1, 0);
+        });
+        window.addEventListener('keyup', e => keys[e.code] = false);
+        
+        window.addEventListener('wheel', e => {
+            if (e.deltaY > 0) zoom *= 0.82;
+            else zoom *= 1.22;
+            zoom = Math.max(0.00000005, Math.min(zoom, 1.5));
+        });
+
+        function getAtmosphericDensity(altitude) {
+            if (altitude > ATMOSPHERE_HEIGHT) return 0;
+            return SEA_LEVEL_DENSITY * Math.exp(-altitude / 10000); 
+        }
+
+        function physicsStep(dt) {
+            const distSq = rocket.x * rocket.x + rocket.y * rocket.y;
+            const dist = Math.sqrt(distSq);
+            const forceG = (G * EARTH_MASS) / distSq;
+            
+            const dx = -rocket.x / dist;
+            const dy = -rocket.y / dist;
+            
+            let ax = dx * forceG;
+            let ay = dy * forceG;
+
+            if (rocket.engineOn) {
+                ax += Math.cos(rocket.angle) * rocket.thrust;
+                ay += Math.sin(rocket.angle) * rocket.thrust;
+            }
+
+            const altitude = dist - EARTH_RADIUS;
+            if (altitude < ATMOSPHERE_HEIGHT && altitude > 0) {
+                const density = getAtmosphericDensity(altitude);
+                const speedSq = rocket.vx * rocket.vx + rocket.vy * rocket.vy;
+                const speed = Math.sqrt(speedSq);
+                if (speed > 0.1) {
+                    const dragMagnitude = 0.5 * density * speedSq * rocket.dragCoeff * 0.05;
+                    ax -= (rocket.vx / speed) * dragMagnitude;
+                    ay -= (rocket.vy / speed) * dragMagnitude;
+                }
+            }
+
+            rocket.vx += ax * dt;
+            rocket.vy += ay * dt;
+            rocket.x += rocket.vx * dt;
+            rocket.y += rocket.vy * dt;
+
+            const newDist = Math.sqrt(rocket.x * rocket.x + rocket.y * rocket.y);
+            if (newDist < EARTH_RADIUS) {
+                rocket.x = (rocket.x / newDist) * EARTH_RADIUS;
+                rocket.y = (rocket.y / newDist) * EARTH_RADIUS;
+                rocket.vx = 0;
+                rocket.vy = 0;
+            }
+            return altitude;
+        }
+
+        function update(dt) {
+            if (keys['ArrowLeft'] || keys['KeyA']) rocket.angle -= rocket.rotationSpeed;
+            if (keys['ArrowRight'] || keys['KeyD']) rocket.angle += rocket.rotationSpeed;
+
+            if (isPaused) return;
+
+            const currentWarp = warpRates[warpIndex];
+            const totalTime = dt * currentWarp;
+            const subSteps = Math.min(Math.ceil(currentWarp), 120); 
+            const subDt = totalTime / subSteps;
+
+            let finalAlt = 0;
+            for(let i=0; i < subSteps; i++) {
+                finalAlt = physicsStep(subDt);
+            }
+
+            updateUI(finalAlt, Math.sqrt(rocket.vx**2 + rocket.vy**2), currentWarp);
+        }
+
+        function updateUI(alt, vel, warp) {
+            document.getElementById('alt-val').innerText = (alt / 1000).toFixed(1) + " km";
+            document.getElementById('vel-val').innerText = Math.round(vel) + " m/s";
+            document.getElementById('eng-val').innerText = rocket.engineOn ? "ON" : "OFF";
+            document.getElementById('eng-val').style.color = rocket.engineOn ? "#ffaa00" : "#00ff00";
+            document.getElementById('warp-label').innerText = warp + "x";
+
+            const status = document.getElementById('orbit-status');
+            if (alt > ATMOSPHERE_HEIGHT) {
+                status.innerText = "Deep Space";
+                status.style.color = "#60a5fa";
+            } else if (alt > ATMOSPHERE_HEIGHT * 0.5) {
+                status.innerText = "Upper Atmosphere";
+                status.style.color = "#93c5fd";
+            } else {
+                status.innerText = "Atmospheric Flight";
+                status.style.color = "#fbbf24";
+            }
+        }
+
+        function drawTrajectory(centerX, centerY) {
+            let tx = rocket.x;
+            let ty = rocket.y;
+            let tvx = rocket.vx;
+            let tvy = rocket.vy;
+            const steps = 1800;
+            const dt = 15; 
+
+            let currentDist = Math.sqrt(tx*tx + ty*ty);
+            let apDist = currentDist;
+            let peDist = currentDist;
+            let apPos = {x:tx, y:ty};
+            let pePos = {x:tx, y:ty};
+
+            ctx.beginPath();
+            ctx.setLineDash([2, 6]);
+            ctx.strokeStyle = "rgba(0, 255, 255, 0.4)";
+            ctx.lineWidth = 1;
+
+            for(let i=0; i<steps; i++) {
+                const d2 = tx*tx + ty*ty;
+                const d = Math.sqrt(d2);
+                const fG = (G * EARTH_MASS) / d2;
+                tvx -= (tx/d) * fG * dt;
+                tvy -= (ty/d) * fG * dt;
+                tx += tvx * dt;
+                ty += tvy * dt;
+
+                if (d > apDist) { apDist = d; apPos = {x:tx, y:ty}; }
+                if (d < peDist) { peDist = d; pePos = {x:tx, y:ty}; }
+
+                const sx = centerX + (tx - rocket.x) * zoom;
+                const sy = centerY + (ty - rocket.y) * zoom;
+                if (i === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+                if (d < EARTH_RADIUS) break;
+                if (d > EARTH_RADIUS * 100) break;
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            const apAlt = apDist - EARTH_RADIUS;
+            const peAlt = peDist - EARTH_RADIUS;
+            
+            document.getElementById('ap-val').innerText = apAlt > 200000000 ? "ESCAPE" : (apAlt/1000).toFixed(0) + " km";
+            document.getElementById('pe-val').innerText = peAlt < 100 ? "GROUND" : (peAlt/1000).toFixed(0) + " km";
+
+            if (apAlt < 200000000) drawMarker(apPos, "Ap", "#ff5555", centerX, centerY);
+            if (peAlt > 0) drawMarker(pePos, "Pe", "#55aaff", centerX, centerY);
+        }
+
+        function drawMarker(pos, label, color, centerX, centerY) {
+            const sx = centerX + (pos.x - rocket.x) * zoom;
+            const sy = centerY + (pos.y - rocket.y) * zoom;
+            ctx.fillStyle = color;
+            ctx.beginPath(); ctx.arc(sx, sy, 4, 0, Math.PI*2); ctx.fill();
+            ctx.font = "10px monospace"; ctx.fillStyle = "white";
+            ctx.fillText(label, sx + 6, sy + 4);
+        }
+
+        function drawEarth(centerX, centerY) {
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.scale(zoom, zoom);
+            ctx.translate(-rocket.x, -rocket.y);
+
+            // 1. Planet Surface drawn FIRST
+            const planetGrad = ctx.createRadialGradient(-EARTH_RADIUS*0.2, -EARTH_RADIUS*0.2, 0, 0, 0, EARTH_RADIUS);
+            planetGrad.addColorStop(0, '#1a4a9a');
+            planetGrad.addColorStop(1, '#051a3a');
+            ctx.fillStyle = planetGrad;
+            ctx.beginPath(); ctx.arc(0, 0, EARTH_RADIUS, 0, Math.PI * 2); ctx.fill();
+
+            // 2. Atmosphere & Limb clipped to strictly ABOVE surface
+            ctx.save();
+            ctx.beginPath();
+            // Outer bounding area (very large)
+            ctx.arc(0, 0, EARTH_RADIUS + ATMOSPHERE_HEIGHT * 3, 0, Math.PI * 2);
+            // Inner exclusion area (the planet)
+            ctx.arc(0, 0, EARTH_RADIUS, 0, Math.PI * 2, true); 
+            ctx.clip();
+
+            // Atmosphere Glow
+            const atmoGrad = ctx.createRadialGradient(0, 0, EARTH_RADIUS, 0, 0, EARTH_RADIUS + ATMOSPHERE_HEIGHT);
+            atmoGrad.addColorStop(0, 'rgba(100, 180, 255, 0.8)');
+            atmoGrad.addColorStop(0.2, 'rgba(60, 140, 255, 0.4)');
+            atmoGrad.addColorStop(0.6, 'rgba(10, 50, 150, 0.1)');
+            atmoGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = atmoGrad;
+            ctx.beginPath(); ctx.arc(0, 0, EARTH_RADIUS + ATMOSPHERE_HEIGHT, 0, Math.PI * 2); ctx.fill();
+
+            // Horizon Limb (Sharp highlight strictly on the edge)
+            const limb = ctx.createRadialGradient(0, 0, EARTH_RADIUS, 0, 0, EARTH_RADIUS + 40000);
+            limb.addColorStop(0, 'rgba(200, 245, 255, 0.9)');
+            limb.addColorStop(1, 'rgba(100, 180, 255, 0)');
+            ctx.fillStyle = limb;
+            ctx.beginPath(); ctx.arc(0, 0, EARTH_RADIUS + 40000, 0, Math.PI * 2); ctx.fill();
+
+            ctx.restore();
+
+            ctx.restore();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            // Stars
+            stars.forEach(s => {
+                const sx = (s.x * canvas.width - rocket.x * 0.000001) % canvas.width;
+                const sy = (s.y * canvas.height - rocket.y * 0.000001) % canvas.height;
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.2 + s.o * 0.5})`;
+                ctx.fillRect(sx < 0 ? sx + canvas.width : sx, sy < 0 ? sy + canvas.height : sy, s.s, s.s);
+            });
+
+            drawEarth(centerX, centerY);
+            drawTrajectory(centerX, centerY);
+
+            // Rocket
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            const rocketScale = Math.max(zoom, 32 / 40);
+            ctx.scale(rocketScale, rocketScale);
+            
+            const vel = Math.sqrt(rocket.vx**2 + rocket.vy**2);
+            if (vel > 5) {
+                const vAngle = Math.atan2(rocket.vy, rocket.vx);
+                ctx.save();
+                ctx.rotate(vAngle + Math.PI/2);
+                ctx.strokeStyle = "#00ff88";
+                ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.arc(0, -45, 6, 0.2, Math.PI - 0.2); ctx.stroke();
+                ctx.restore();
+            }
+
+            ctx.rotate(rocket.angle + Math.PI/2);
+
+            if (rocket.engineOn && !isPaused) {
+                ctx.fillStyle = "#ff5500";
+                ctx.beginPath();
+                ctx.moveTo(-4, 12); ctx.lineTo(4, 12); ctx.lineTo(0, 45 + Math.random()*25); ctx.fill();
+                ctx.fillStyle = "#ffcc00";
+                ctx.beginPath();
+                ctx.moveTo(-2, 12); ctx.lineTo(2, 12); ctx.lineTo(0, 22 + Math.random()*8); ctx.fill();
+            }
+
+            ctx.fillStyle = "#f5f5f5";
+            ctx.fillRect(-5, -15, 10, 30);
+            ctx.beginPath(); ctx.moveTo(-5, -15); ctx.lineTo(5, -15); ctx.lineTo(0, -28); ctx.fill();
+            ctx.fillStyle = "#aa0000";
+            ctx.beginPath(); ctx.moveTo(-5, 5); ctx.lineTo(-12, 15); ctx.lineTo(-5, 15); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(5, 5); ctx.lineTo(12, 15); ctx.lineTo(5, 15); ctx.fill();
+
+            ctx.restore();
+        }
+
+        let lastTime = performance.now();
+        function loop(t) {
+            const dt = Math.min((t - lastTime) / 1000, 0.1);
+            lastTime = t;
+            update(dt);
+            draw();
+            requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+    </script>
+</body>
+</html>
